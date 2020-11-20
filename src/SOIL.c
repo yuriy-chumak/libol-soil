@@ -21,11 +21,14 @@
 	#include <wingdi.h>
 	#include <GL/gl.h>
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
-	/*	I can't test this Apple stuff!	*/
 	#include <OpenGL/gl.h>
 	#include <Carbon/Carbon.h>
     #import <mach-o/dyld.h>
 	#define APIENTRY
+#elif defined(__ANDROID__)
+ 	#include <GLES/gl.h>
+ 	#include <GLES/egl.h>
+	#define APIENTRY GL_APIENTRY
 #else
 	#include <GL/gl.h>
 	#include <GL/glx.h>
