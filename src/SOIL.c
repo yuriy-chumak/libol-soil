@@ -1973,46 +1973,48 @@ static int soilTestWinProcPointer(const PROC pTest)
 }
 #endif
 
-    void *soilLoadProcAddr(const char *procName)
-    {
-    #ifdef WIN32
-        PROC p = wglGetProcAddress(procName);
-        if (soilTestWinProcPointer(p))
-            return p;
-        else
-            return NULL;
+void *soilLoadProcAddr(const char *procName)
+{
+#ifdef WIN32
+    PROC p = wglGetProcAddress(procName);
+    if (soilTestWinProcPointer(p))
+        return p;
+    else
+        return NULL;
 
-    #elif defined(__APPLE__) || defined(__APPLE_CC__)
-        /* modified for deprecated methods */        
-        CFURLRef bundleURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-            CFSTR("/System/Library/Frameworks/OpenGL.framework"),
-            kCFURLPOSIXPathStyle,
-            true );
-        CFStringRef extensionName = CFStringCreateWithCString(kCFAllocatorDefault,
-            procName,
-            kCFStringEncodingASCII );
+#elif defined(__APPLE__) || defined(__APPLE_CC__)
+    /* modified for deprecated methods */        
+    CFURLRef bundleURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
+        CFSTR("/System/Library/Frameworks/OpenGL.framework"),
+        kCFURLPOSIXPathStyle,
+        true );
+    CFStringRef extensionName = CFStringCreateWithCString(kCFAllocatorDefault,
+        procName,
+        kCFStringEncodingASCII );
 
-        CFBundleRef bundle = CFBundleCreate( kCFAllocatorDefault, bundleURL );
-        assert( bundle != NULL );
+    CFBundleRef bundle = CFBundleCreate( kCFAllocatorDefault, bundleURL );
+    assert( bundle != NULL );
 
-        void *ext_addr = CFBundleGetFunctionPointerForName(bundle, extensionName);
+    void *ext_addr = CFBundleGetFunctionPointerForName(bundle, extensionName);
 
-        CFRelease( bundleURL );
-        CFRelease( extensionName );
-        CFRelease( bundle );
+    CFRelease( bundleURL );
+    CFRelease( extensionName );
+    CFRelease( bundle );
 
-        return ext_addr;
-    #elif defined ( linux ) || defined( __linux__ )
-        #if !defined(GLX_VERSION_1_4)
-            return glXGetProcAddressARB( (const GLubyte *)procName );
-        #else
-            return glXGetProcAddress( (const GLubyte *)procName );
-        #endif
+    return ext_addr;
+#elif defined ( __ANDROID__ )
+    return eglGetProcAddress( procName );
+#elif defined ( linux ) || defined( __linux__ )
+    #if !defined(GLX_VERSION_1_4)
+        return glXGetProcAddressARB( (const GLubyte *)procName );
     #else
-        return NULL;    // unsupported
-    #endif  
+        return glXGetProcAddress( (const GLubyte *)procName );
+    #endif
+#else
+    return NULL;    // unsupported
+#endif  
 
-    }
+}
 
 int query_NPOT_capability( void )
 {
