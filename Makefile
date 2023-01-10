@@ -49,3 +49,9 @@ uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/include/SOIL/SOIL.h
 	@echo -------------------------------------------------------------------
 	@echo SOIL library uninstalled.
+
+# -----------------------------------------------------------------------------------------------
+# win32 build
+soil.dll: CC:=x86_64-w64-mingw32-gcc
+soil.dll: src/SOIL.c src/image_DXT.c src/image_helper.c src/stb_image_aug.c src/stb_image_write.c
+	$(CC) -shared $(CFLAGS) -Iinclude $^ -o $@ -lopengl32
